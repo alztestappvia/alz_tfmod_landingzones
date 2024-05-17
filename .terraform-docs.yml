@@ -1,0 +1,50 @@
+content: |-
+  # Terraform.LandingZones
+
+  This Terraform Module deploys an Application Landing Zone and creates an AAD Application, Service Principal and Connection to a given Azure DevOps Project or GitHub repository for Owner access to the Subscription.
+
+  ## Updating Docs
+
+  The `terraform-docs` utility is used to generate this README. Follow the below steps to update:
+  1. Make changes to the `.terraform-docs.yml` file
+  2. Fetch the `terraform-docs` binary (https://terraform-docs.io/user-guide/installation/)
+  3. Run `terraform-docs markdown table --output-file ${PWD}/README.md --output-mode inject .`
+
+  ## Example Module Use
+
+  To create a new Subscription, view the example below.
+
+  ```hcl
+  {{ include "examples/main.tf" }}
+  ```
+
+  ## Important Notes
+
+  ### Private Endpoint Subnet
+
+  In order to support Private Endpoints, a `/28` Subnet must be created within all Virtual Networks. As this Module supports a list of CIDRs for a vnet, the first CIDR in the list is taken and a `/28` block of it is used to create a single Subnet. For example:
+  ```hcl
+  {{ include "examples/private-endpoint-subnet.tf" }}
+  ```
+
+  **vnet1:**
+  - The Virtual Network CIDR is `10.30.1.0/24`
+  - A subnet will be created from this as `10.30.1.0/28`
+  - The remaining addresses that can be allocated to new subnets range from `10.30.1.16 - 10.30.1.255`
+
+  **vnet2:**
+  - The Virtual Network CIDR is `10.30.2.128/25`
+  - A subnet will be created from this as `10.30.2.128/28`
+  - The remaining addresses that can be allocated to new subnets range from `10.30.2.144 - 10.30.2.255`
+
+  **vnet3:**
+  - The Virtual Network has two CIDRs allocated, `10.30.3.0/28` and `10.30.4.0/24`
+  - A subnet will be created from this as `10.30.3.0/28`
+  - The remaining addresses that can be allocated to new subnets range from `10.30.4.0 - 10.30.4.255`
+
+  This means that the first CIDR range in the list must be at least a `/28` in size, otherwise the subnet will fail to provision and Terraform will error.
+
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
